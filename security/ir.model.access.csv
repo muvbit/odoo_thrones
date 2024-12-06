@@ -5,3 +5,4 @@ access_odoo_thrones_building,odoo_thrones.building,model_odoo_thrones_building,b
 access_odoo_thrones_weapon,odoo_thrones.weapon,model_odoo_thrones_weapon,base.group_user,1,1,1,1
 access_odoo_thrones_boat,odoo_thrones.boat,model_odoo_thrones_boat,base.group_user,1,1,1,1
 access_odoo_thrones_creature,odoo_thrones.creature,model_odoo_thrones_creature,base.group_user,1,1,1,1
+access_odoo_thrones_unit,odoo_thrones.unit,model_odoo_thrones_unit,base.group_user,1,1,1,1

@@ -2,13 +2,14 @@
   <data>
     <!-- explicit list view definition -->
 
-    <record model="ir.ui.view" id="odoo_thrones.tree">
+   <record model="ir.ui.view" id="odoo_thrones.player_list">
       <field name="name">odooThrones list</field>
       <field name="model">odoo_thrones.player</field>
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
           <field name="house"/>
+          <field name="photo"/>
           <field name="level"/>
           <field name="gold"/>
           <field name="food"/>
@@ -26,11 +27,9 @@
         </tree>
       </field>
     </record>
--->
 
     <!-- actions opening views on models -->
-
-    <record model="ir.actions.act_window" id="odoo_thrones.player_action_window">
+     <record model="ir.actions.act_window" id="odoo_thrones.player_action_window">
       <field name="name">odooThrones Players window</field>
       <field name="res_model">odoo_thrones.player</field>
       <field name="view_mode">tree,form</field>
@@ -67,8 +66,6 @@
     </record>
 
 
-
-
     <!-- server action to the one above -->
 <!--
     <record model="ir.actions.server" id="odoo_thrones.action_server">
@@ -78,7 +75,7 @@
       <field name="code">
         action = {
           "type": "ir.actions.act_window",
-          "view_mode": "list,form",
+          "view_mode": "tree,form",
           "res_model": model._name,
         }
       </field>
@@ -87,8 +84,8 @@
 
     <!-- Top menu item -->
 
-    <menuitem name="odooThrones" id="odoo_thrones.menu_root"/>
--->
+   <menuitem name="odooThrones" id="odoo_thrones.menu_root"/>
+
     <!-- menu categories -->
     <menuitem name="Management" id="odoo_thrones.menuManagement" parent="odoo_thrones.menu_root"/>
     <!-- <menuitem name="Menu 2" id="odoo_thrones.menu_2" parent="odoo_thrones.menu_root"/> -->
@@ -109,6 +106,5 @@
               action="odoo_thrones.boat_action_window"/>
     <menuitem name="Creatures" id="odoo_thrones.menu_creature_list" parent="odoo_thrones.menuManagement"
               action="odoo_thrones.creature_action_window"/>
-
   </data>
 </odoo>

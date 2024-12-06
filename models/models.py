@@ -3,7 +3,7 @@ from email.policy import default
 
 from cloudinit.config.cc_spacewalk import required_packages
 from odoo import models, fields, api
-from odoo.api import readonly
+
 from odoo.fields import One2many
 
 
@@ -32,7 +32,7 @@ class Player (models.Model):
     workers=fields.Integer(readonly=True)
     soldiers=fields.Integer(readonly=True)
 
-    houses=fields.One2many("odoo_thrones.house","player_id",string="Casas")
+    houses=fields.One2many("odoo_thrones.house","player_id",string="Casa")
     buildings=fields.One2many("odoo_thrones.building","player_id",string="Casas")
     units=fields.One2many("odoo_thrones.unit","player_id",string="Unidades ejercito")
     weapons=fields.One2many("odoo_thrones.weapon","player_id",string="Armas")
