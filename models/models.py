@@ -12,6 +12,7 @@ class Player (models.Model):
     _description = 'Jugador de GOT'
 
     name = fields.Char(string="Nombre del jugador",required=True)
+    photo=fields.Image()
     house= fields.Selection([("stark","Stark"),
                              ("lannister","Lannister"),
                              ('targaryen', 'Targaryen'),
