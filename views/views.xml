@@ -1,110 +1,239 @@
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
+    <data>
+        <!-- explicit list view definition -->
 
-   <record model="ir.ui.view" id="odoo_thrones.player_list">
-      <field name="name">odooThrones list</field>
-      <field name="model">odoo_thrones.player</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="house"/>
-          <field name="photo"/>
-          <field name="level"/>
-          <field name="gold"/>
-          <field name="food"/>
-          <field name="wood"/>
-          <field name="iron"/>
-          <field name="total_population"/>
-          <field name="workers"/>
-          <field name="soldiers"/>
-          <field name="houses"/>
-          <field name="buildings"/>
-          <field name="units"/>
-          <field name="weapons"/>
-          <field name="boats"/>
-          <field name="creatures"/>
-        </tree>
-      </field>
-    </record>
+        <!-- VISTAS TREE -->
+        <record model="ir.ui.view" id="odoo_thrones.player_list">
+            <field name="name">odooThrones player list</field>
+            <field name="model">odoo_thrones.player</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="level==1">
+                    <field name="user"/>
+                    <field name="flag" widget="image" height="40"/>
+                    <field name="level"/>
+                    <field name="gold"/>
+                    <field name="wood"/>
+                    <field name="iron"/>
+                    <field name="buildings"/>
+                    <field name="units"/>
+                    <field name="ships"/>
+                    <field name="creatures"/>
+                </tree>
+            </field>
+        </record>
 
-    <!-- actions opening views on models -->
-     <record model="ir.actions.act_window" id="odoo_thrones.player_action_window">
-      <field name="name">odooThrones Players window</field>
-      <field name="res_model">odoo_thrones.player</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-     <record model="ir.actions.act_window" id="odoo_thrones.building_action_window">
-      <field name="name">odooThrones Buildings window</field>
-      <field name="res_model">odoo_thrones.building</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    <record model="ir.actions.act_window" id="odoo_thrones.house_action_window">
-      <field name="name">odooThrones Houses window</field>
-      <field name="res_model">odoo_thrones.house</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    <record model="ir.actions.act_window" id="odoo_thrones.unit_action_window">
-      <field name="name">odooThrones Units window</field>
-      <field name="res_model">odoo_thrones.unit</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    <record model="ir.actions.act_window" id="odoo_thrones.weapon_action_window">
-      <field name="name">odooThrones Weapon window</field>
-      <field name="res_model">odoo_thrones.weapon</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    <record model="ir.actions.act_window" id="odoo_thrones.boat_action_window">
-      <field name="name">odooThrones Boats window</field>
-      <field name="res_model">odoo_thrones.boat</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-    <record model="ir.actions.act_window" id="odoo_thrones.creature_action_window">
-      <field name="name">odooThrones Creatures window</field>
-      <field name="res_model">odoo_thrones.creature</field>
-      <field name="view_mode">tree,form</field>
-    </record>
+        <record model="ir.ui.view" id="odoo_thrones.building_list">
+            <field name="name">odooThrones building list</field>
+            <field name="model">odoo_thrones.building</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="level==1">
+                    <field name="name"/>
+                    <field name="level"/>
+                    <field name="gold_cost"/>
+                    <field name="wood_cost"/>
+                    <field name="iron_cost"/>
+                    <field name="resource"/>
+                    <field name="resource_amount_turn"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="odoo_thrones.unit_list">
+            <field name="name">odooThrones Unit list</field>
+            <field name="model">odoo_thrones.unit</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="level==1">
+                    <field name="name"/>
+                    <field name="level"/>
+                    <field name="health"/>
+                    <field name="attack"/>
+                    <field name="defense"/>
+                    <field name="gold_cost"/>
+                    <field name="wood_cost"/>
+                    <field name="iron_cost"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="odoo_thrones.creature_list">
+            <field name="name">odooThrones Creature list</field>
+            <field name="model">odoo_thrones.creature</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="level==1">
+                    <field name="name"/>
+                    <field name="house"/>
+                    <field name="level"/>
+                    <field name="health"/>
+                    <field name="attack"/>
+                    <field name="defense"/>
+                    <field name="gold_cost"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="odoo_thrones.ship_list">
+            <field name="name">odooThrones Ship list</field>
+            <field name="model">odoo_thrones.ship</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="level==1">
+                    <field name="name"/>
+                    <field name="level"/>
+                    <field name="health"/>
+                    <field name="cannons"/>
+                    <field name="attack"/>
+                    <field name="defense"/>
+                    <field name="gold_cost"/>
+                    <field name="wood_cost"/>
+                    <field name="iron_cost"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- VISTA FORM -->
+        <record model="ir.ui.view" id="odoo_thrones.player_form">
+            <field name="name">odooThrones Player form</field>
+            <field name="model">odoo_thrones.player</field>
+            <field name="arch" type="xml">
+                <form>
+                  <header>
+                      <button name="decrement_level" type="object" icon="fa-level-down" string="-Nivel"/>
+                      <button name="increment_level" type="object" icon="fa-level-up" string="+Nivel"/>
+
+                      <field name="house" widget="statusbar"/>
+                  </header>
+                    <sheet>
+
+                        <field name="avatar" widget="image" height="150"/>
+                        <field name="flag" widget="image" height="60"/>
+                        <group>
+                            <field name="user"/>
+                            <group>
+                                <separator string="Datos Jugador"/>
+                                <field name="level"/>
+                                <field name="name"/>
+                                <field name="birth_date"/>
+                                <field name="house"/>
+                                <field name="password" type="password"/>
+                                <field name="enrollment_date"/>
+                            </group>
+                            <group>
+                                <separator string="Recursos"/>
+                                <field name="wood"/>
+                                <field name="iron"/>
+                                <field name="gold"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Edificios">
+                                <field name="buildings">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="amount"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
 
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="odoo_thrones.action_server">
-      <field name="name">odooThrones server</field>
-      <field name="model_id" ref="model_odoo_thrones_odoo_thrones"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": model._name,
-        }
-      </field>
-    </record>
--->
 
-    <!-- Top menu item -->
 
-   <menuitem name="odooThrones" id="odoo_thrones.menu_root"/>
 
-    <!-- menu categories -->
-    <menuitem name="Management" id="odoo_thrones.menuManagement" parent="odoo_thrones.menu_root"/>
-    <!-- <menuitem name="Menu 2" id="odoo_thrones.menu_2" parent="odoo_thrones.menu_root"/> -->
 
-    <!-- actions -->
+        <!-- VISTA KANBAN -->
 
-    <menuitem name="Players" id="odoo_thrones.menu_player_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.player_action_window"/>
-    <menuitem name="Houses" id="odoo_thrones.menu_house_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.house_action_window"/>
-    <menuitem name="Players" id="odoo_thrones.menu_building_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.building_action_window"/>
-    <menuitem name="Units" id="odoo_thrones.menu_unit_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.unit_action_window"/>
-    <menuitem name="Weapons" id="odoo_thrones.menu_weapon_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.weapon_action_window"/>
-    <menuitem name="Boats" id="odoo_thrones.menu_boat_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.boat_action_window"/>
-    <menuitem name="Creatures" id="odoo_thrones.menu_creature_list" parent="odoo_thrones.menuManagement"
-              action="odoo_thrones.creature_action_window"/>
-  </data>
+
+
+
+
+
+         <!-- VISTAS SEARCH -->
+        <record model="ir.ui.view" id="odoo_thrones.player_search">
+            <field name="name">odooThrones player search</field>
+            <field name="model">odoo_thrones.player</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="level" string="Nivel desde" filter_domain="[('level','>=',self)]"/>
+                    <filter name="group_by_house" string="Agrupar por casa" context="{'group_by':'house'}"/>
+                </search>
+            </field>
+        </record>
+
+
+
+
+
+
+        <!-- actions opening views on models -->
+        <record model="ir.actions.act_window" id="odoo_thrones.player_action_window">
+            <field name="name">odooThrones Players</field>
+            <field name="res_model">odoo_thrones.player</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="odoo_thrones.building_action_window">
+            <field name="name">odooThrones Buildings window</field>
+            <field name="res_model">odoo_thrones.building</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="odoo_thrones.unit_action_window">
+            <field name="name">odooThrones Units window</field>
+            <field name="res_model">odoo_thrones.unit</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="odoo_thrones.ship_action_window">
+            <field name="name">odooThrones Ships window</field>
+            <field name="res_model">odoo_thrones.ship</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="odoo_thrones.creature_action_window">
+            <field name="name">odooThrones Creatures window</field>
+            <field name="res_model">odoo_thrones.creature</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- server action to the one above -->
+        <!--
+            <record model="ir.actions.server" id="odoo_thrones.action_server">
+              <field name="name">odooThrones server</field>
+              <field name="model_id" ref="model_odoo_thrones_odoo_thrones"/>
+              <field name="state">code</field>
+              <field name="code">
+                action = {
+                  "type": "ir.actions.act_window",
+                  "view_mode": "tree,form",
+                  "res_model": model._name,
+                }
+              </field>
+            </record>
+        -->
+
+        <!-- Top menu item -->
+
+        <menuitem name="odooThrones" id="odoo_thrones.menu_root"/>
+
+        <!-- menu categories -->
+        <menuitem name="Management" id="odoo_thrones.menuManagement" parent="odoo_thrones.menu_root"/>
+        <!-- <menuitem name="Menu 2" id="odoo_thrones.menu_2" parent="odoo_thrones.menu_root"/> -->
+
+        <!-- actions -->
+
+        <menuitem name="Players" id="odoo_thrones.menu_player_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.player_action_window"/>
+        <menuitem name="Buildings" id="odoo_thrones.menu_building_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.building_action_window"/>
+        <menuitem name="Units" id="odoo_thrones.menu_unit_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.unit_action_window"/>
+        <menuitem name="Ships" id="odoo_thrones.menu_ship_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.ship_action_window"/>
+        <menuitem name="Creatures" id="odoo_thrones.menu_creature_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.creature_action_window"/>
+    </data>
 </odoo>

@@ -1,8 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_odoo_thrones_player,odoo_thrones.player,model_odoo_thrones_player,base.group_user,1,1,1,1
-access_odoo_thrones_house,odoo_thrones.house,model_odoo_thrones_house,base.group_user,1,1,1,1
 access_odoo_thrones_building,odoo_thrones.building,model_odoo_thrones_building,base.group_user,1,1,1,1
-access_odoo_thrones_weapon,odoo_thrones.weapon,model_odoo_thrones_weapon,base.group_user,1,1,1,1
-access_odoo_thrones_boat,odoo_thrones.boat,model_odoo_thrones_boat,base.group_user,1,1,1,1
+access_odoo_thrones_ship,odoo_thrones.ship,model_odoo_thrones_ship,base.group_user,1,1,1,1
 access_odoo_thrones_creature,odoo_thrones.creature,model_odoo_thrones_creature,base.group_user,1,1,1,1
 access_odoo_thrones_unit,odoo_thrones.unit,model_odoo_thrones_unit,base.group_user,1,1,1,1
+access_odoo_thrones_player_unit,odoo_thrones.player_unit,model_odoo_thrones_player_unit,base.group_user,1,1,1,1
+access_odoo_thrones_player_building,odoo_thrones.player_building,model_odoo_thrones_player_building,base.group_user,1,1,1,1
+access_odoo_thrones_player_creature,odoo_thrones.player_creature,model_odoo_thrones_player_creature,base.group_user,1,1,1,1
+access_odoo_thrones_player_ship,odoo_thrones.player_ship,model_odoo_thrones_player_ship,base.group_user,1,1,1,1

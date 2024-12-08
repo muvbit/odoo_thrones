@@ -1,18 +1,42 @@
 # -*- coding: utf-8 -*-
+import base64
+import os
+from datetime import datetime, date
 from email.policy import default
 
 from cloudinit.config.cc_spacewalk import required_packages
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 from odoo.fields import One2many
 
 
 class Player (models.Model):
     _name = 'odoo_thrones.player'
-    _description = 'Jugador de GOT'
+    _description = 'Jugador de odooThrones'
 
+    user=fields.Char(string="Nombre de usuario", required=True)
+    password=fields.Char(string="Contraseña", password=True, required=True)
+    @api.constrains('password')
+    def _check_password_length(self):
+        for player in self:
+            if len(player.password) < 6:
+                raise ValidationError("La contraseña debe tener al menos 6 caracteres.")
     name = fields.Char(string="Nombre del jugador",required=True)
-    photo=fields.Image()
+    birth_date = fields.Date(string="Año de nacimiento", required=True)
+
+    @api.constrains("birth_date")
+    def _chech_birthdate(self):
+        for player in self:
+            if player.birth_date:
+                today = date.today()
+                age = today.year - player.birth_date.year
+                if today.month < player.birth_date.month or (today.month == player.birth_date.month and today.day < player.birth_date.day):
+                    age -= 1
+                if age < 16:
+                    raise ValidationError("No se pueden registrar jugadores menores de 16 años.")
+    enrollment_date=fields.Datetime(default=lambda s:fields.Datetime.now(), readonly=True)
+    avatar=fields.Image(max_width=200, max_height=200)
     house= fields.Selection([("stark","Stark"),
                              ("lannister","Lannister"),
                              ('targaryen', 'Targaryen'),
@@ -22,23 +46,78 @@ class Player (models.Model):
                              ('tyrell', 'Tyrell'),
                              ('tully', 'Tully'),
                              ('arryn', 'Arryn')],
-                            string="Selecciona la casa", required=True)
+                            string="Linaje", required=True)
 
-    level=fields.Integer(default=0, readonly=True)
-    gold=fields.Integer(default=10000, readonly=True)
-    food=fields.Integer(default=15000, readonly=True)
-    wood=fields.Integer(default=1000, readonly=True)
-    iron=fields.Integer(default=0, readonly=True)
-    total_population=fields.Integer(default=100, readonly=True)
-    workers=fields.Integer(readonly=True)
-    soldiers=fields.Integer(readonly=True)
+    @api.depends("house")
+    def _get_houseFlag(self):
+        module_path = os.path.dirname(os.path.abspath(__file__))
+        flags_path = os.path.join(module_path, '../static/images/flags')
 
-    houses=fields.One2many("odoo_thrones.house","player_id",string="Casa")
-    buildings=fields.One2many("odoo_thrones.building","player_id",string="Casas")
-    units=fields.One2many("odoo_thrones.unit","player_id",string="Unidades ejercito")
-    weapons=fields.One2many("odoo_thrones.weapon","player_id",string="Armas")
-    creatures=fields.One2many("odoo_thrones.creature","player_id",string="Criaturas")
-    boats=fields.One2many("odoo_thrones.boat","player_id",string="Barcos")
+        # Relacionamos los linajes con los archivos de las banderas
+        house_flags = {
+            "stark": "stark.webp",
+            "lannister": "lannister.webp",
+            "targaryen": "targaryen.webp",
+            "greyjoy": "greyjoy.webp",
+            "baratheon": "baratheon.webp",
+            "martell": "martell.webp",
+            "tyrell": "tyrell.webp",
+            "tully": "tully.webp",
+            "arryn": "arryn.webp",
+        }
+
+        for record in self:
+            image_file = house_flags.get(record.house)
+            if image_file:
+                image_path = os.path.join(flags_path, image_file)
+                try:
+                    with open(image_path, 'rb') as f:
+                        record.flag = base64.b64encode(f.read())
+                except FileNotFoundError:
+                    record.flag = False
+            else:
+                record.flag = False
+
+    flag=fields.Image(string="Casa", compute="_get_houseFlag")
+
+    level=fields.Integer(default=1)
+
+    #Recursos
+    gold=fields.Integer(string="Oro",default=10000, readonly=True)
+    wood=fields.Integer(string="Madera",default=100, readonly=True)
+    iron=fields.Integer(string="Hierro",default=0, readonly=True)
+
+    #Propiedades
+    buildings=fields.One2many("odoo_thrones.player_building", "player_id","Edificios")
+
+    #Propiedades para batalla
+    units=fields.One2many("odoo_thrones.player_unit","player_id",string="Unidades ejercito")
+    creatures = fields.One2many("odoo_thrones.player_creature","player_id", string="Criaturas")
+    ships=fields.One2many("odoo_thrones.player_ship","player_id",string="Barcos")
+
+    def increment_gold(self):
+        self.gold += 100
+
+    def increment_wood(self):
+        self.wood+=100
+
+    def increment_iron(self):
+        self.iron+=100
+    def increment_level(self):
+        self.level+=1
+
+    def decrement_gold(self):
+        self.gold -= 100
+
+    def decrement_wood(self):
+        self.wood -= 100
+
+    def decrement_iron(self):
+        self.iron -= 100
+
+    def decrement_level(self):
+        self.level -= 1
+
 
 
 
@@ -47,47 +126,25 @@ class Building (models.Model):
     _description = "Edificios"
 
     name=fields.Char(string="Nombre del edificio",required=True)
-    description=fields.Char(string="Tipo de edificio")
 
-    health=fields.Integer(string="Puntos de vida", required=True)
+    level=fields.Integer(string="Nivel", default=1, required=True)
     gold_cost = fields.Integer(string="Coste en oro", required=True)
     wood_cost=fields.Integer(string="Coste en madera", required=True)
     iron_cost=fields.Integer(string="Coste en hierro", required=True)
-    workers_required=fields.Integer(string="Mano de obra necesaria", required=True)
-    player_id=fields.Many2one("odoo_thrones.player",string="Jugador")
+    resource=fields.Selection([('gold','Oro'),('iron','Hierro'),('wood','Madera')], string="Aporta recurso", required=True)
+    resource_amount_turn=fields.Integer(string="Aporta por turno", default=0, required=True)
 
-class House (models.Model):
-    _name = "odoo_thrones.house"
-    _description = "Casas"
+class PlayerBuilding(models.Model):
+    _name = "odoo_thrones.player_building"
+    _description = "Edificios del jugador"
 
-    name = fields.Char(string="Nombre del edificio", required=True)
-    description = fields.Char(string="Tipo de casa")
-    gold_cost = fields.Integer(string="Coste en oro", required=True)
-    wood_cost = fields.Integer(string="Coste en madera", required=True)
-    iron_cost = fields.Integer(string="Coste en hierro", required=True)
-    citizen=fields.Integer(string="Capacidad ciudadanos",required=True)
-    player_id=fields.Many2one("odoo_thrones.player",string="Jugador")
-
-class Weapon (models.Model):
-    _name = "odoo_thrones.weapon"
-    _description = "Armas"
-
-    name = fields.Char(string="Nombre del arma", required=True)
-    description = fields.Char(string="Descripción")
-    type=fields.Char(string="Tipo de arma", required=True)
-    max_uses=fields.Integer(string="Número de usos", required=True)
-
-    gold_cost = fields.Integer(string="Coste en oro", required=True)
-    wood_cost = fields.Integer(string="Coste en madera", required=True)
-    iron_cost = fields.Integer(string="Coste en hierro", required=True)
+    name=fields.Char(related="building_id.name")
     player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
-
-class PlayerWeapon(models.Model):
-    _name = "odoo_thrones.player_weapon"
-    _description = "Armas del jugador"
-
-    player_id=fields.Many2one("odoo_thrones.player",string="Jugador")
-    weapon_id=fields.Many2one("odoo_thrones.weapon",string="Arma")
+    building_id = fields.Many2one("odoo_thrones.building", string="Edificio")
+    amount=fields.Integer(default=0)
+    _sql_constraints = [
+        ('unique_player_building', 'unique(player_id, building_id)',
+         'Cada jugador solo puede tener un registro por tipo de edificio.'),]
 
 
 class Creature (models.Model):
@@ -104,13 +161,14 @@ class Creature (models.Model):
                               ('tyrell', 'Tyrell'),
                               ('tully', 'Tully'),
                               ('arryn', 'Arryn')],
-                             string="Selecciona la casa", required=True)
-    health = fields.Integer(string="Puntos de vida", required=True)
-    level=fields.Integer(default=0, required=True)
-    attack=fields.Integer(string="Puntos de ataque", required=True)
-    defense=fields.Integer(string="Puntos de defensa", required=True)
-    vulnerability=fields.Selection([("fire","Fuego"),("water","Agua"),("ice","Hielo"),("dragonglass","Vidriagon"),("nothing","No tiene")],string="Vulnerable a", required=True)
-    player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
+                             string="Casa", required=True)
+
+    health = fields.Integer(string="Vida", required=True)
+    gold_cost=fields.Integer(string="Coste en oro")
+    level=fields.Integer(string="Nivel")
+    attack=fields.Integer(string="Ataque", required=True)
+    defense=fields.Integer(string="Defensa", required=True)
+
 
 
 class PlayerCreature(models.Model):
@@ -120,6 +178,11 @@ class PlayerCreature(models.Model):
     name=fields.Char(string="Nombre de la criatura")
     player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
     creature_id = fields.Many2one("odoo_thrones.creature", string="Criatura")
+    level = fields.Integer(related='creature_id.level', string="Nivel requerido", readonly=True)
+    amount=fields.Integer(default=0)
+    _sql_constraints = [
+        ('unique_player_creature', 'unique(player_id, creature_id)',
+         'Cada jugador solo puede tener un registro por tipo de criatura.'),]
 
 
 class Unit (models.Model):
@@ -128,10 +191,12 @@ class Unit (models.Model):
 
     name = fields.Char(string="Nombre de la unidad", required=True)
     health = fields.Integer(string="Puntos de vida", required=True)
-    level = fields.Integer(default=0, required=True)
+    level=fields.Integer(string="Nivel requerido", required=True)
     attack = fields.Integer(string="Puntos de ataque", required=True)
     defense = fields.Integer(string="Puntos de defensa", required=True)
-    player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
+    gold_cost = fields.Integer(string="Coste en oro", required=True)
+    wood_cost = fields.Integer(string="Coste en madera", required=True)
+    iron_cost = fields.Integer(string="Coste en hierro", required=True)
 
 
 class PlayerUnit(models.Model):
@@ -139,35 +204,38 @@ class PlayerUnit(models.Model):
     _description = "Unidades del jugador"
 
     player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
-    weapon_id = fields.Many2one("odoo_thrones.unit", string="Unidad")
+    unit_id = fields.Many2one("odoo_thrones.unit", string="Unidad")
+    level = fields.Integer(related='unit_id.level', string="Nivel requerido", readonly=True)
+    amount=fields.Integer(string="Cantidad",default=0)
 
-class Boat(models.Model):
-    _name = "odoo_thrones.boat"
+    _sql_constraints = [('unique_player_unit', 'unique(player_id, unit_id)', 'Cada jugador solo puede tener un registro por tipo de unidad.'),]
+
+class Ship(models.Model):
+    _name = "odoo_thrones.ship"
     _description = "Barcos"
 
     name=fields.Char(string="Nombre del barco", required=True)
+    level=fields.Integer(string="Nivel", required=True)
     health = fields.Integer(string="Puntos de vida", required=True)
     cannons= fields.Integer(string="Cañones",required=True)
-    max_cannons=fields.Integer(string="Cañones máximos",required=True)
     attack = fields.Integer(string="Puntos de ataque", required=True)
     defense = fields.Integer(string="Puntos de defensa", required=True)
-    player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
-    assigned_weapon=fields.Many2one("odoo_thrones.player_boat_weapon", string="Armas asignadas")
+    gold_cost=fields.Integer(string="Coste en oro", required=True)
+    wood_cost = fields.Integer(string="Coste en madera", required=True)
+    iron_cost = fields.Integer(string="Coste en hierro", required=True)
 
-class PlayerBoat(models.Model):
-    _name = "odoo_thrones.player_boat"
+class PlayerShip(models.Model):
+    _name = "odoo_thrones.player_ship"
     _description = "Barcos del jugador"
 
-    player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
-    weapon_id = fields.Many2one("odoo_thrones.boat", string="Barco")
+    player_id = fields.Many2one("odoo_thrones.player", string="Jugador", required=True)
+    ship_id = fields.Many2one("odoo_thrones.ship", string="Barco", required=True)
+    level = fields.Integer(related='ship_id.level', string="Nivel requerido", readonly=True)
+    amount = fields.Integer(string="Cantidad", default=0)
 
-class PlayerBoatWeapon(models.Model):
-    _name = "odoo_thrones.player_boat_weapon"
-    _description = "Armas del barco del jugador"
 
-    player_weapon_id = fields.Many2one("odoo_thrones.player_weapon", string="Arma")
-    boat_id= fields.Many2one("odoo_thrones.boat", string="Barco")
-    remainingUses=fields.Integer(string="Usos restantes")
+    _sql_constraints = [('unique_player_ship', 'unique(player_id, ship_id)','Cada jugador solo puede tener un registro por tipo de barco.'),]
+
 
 
 
