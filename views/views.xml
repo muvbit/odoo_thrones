@@ -95,12 +95,12 @@
             <field name="model">odoo_thrones.player</field>
             <field name="arch" type="xml">
                 <form>
-                  <header>
-                      <button name="decrement_level" type="object" icon="fa-level-down" string="-Nivel"/>
-                      <button name="increment_level" type="object" icon="fa-level-up" string="+Nivel"/>
+                    <header>
+                        <button name="decrement_level" type="object" icon="fa-level-down" string="-Nivel"/>
+                        <button name="increment_level" type="object" icon="fa-level-up" string="+Nivel"/>
 
-                      <field name="house" widget="statusbar"/>
-                  </header>
+                        <field name="house" widget="statusbar"/>
+                    </header>
                     <sheet>
 
                         <field name="avatar" widget="image" height="150"/>
@@ -133,6 +133,30 @@
                                     </tree>
                                 </field>
                             </page>
+                            <page string="Ejercito">
+                                <field name="units">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="amount"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Barcos">
+                                <field name="ships">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="amount"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Criaturas">
+                                <field name="creatures">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="amount"/>
+                                    </tree>
+                                </field>
+                            </page>
                         </notebook>
 
                     </sheet>
@@ -141,40 +165,94 @@
         </record>
 
 
-
-
-
-
         <!-- VISTA KANBAN -->
+        <record model="ir.ui.view" id="odoo_thrones.player_kanban">
+            <field name="name">odoo_thrones.player kanban</field>
+            <field name="model">odoo_thrones.player</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="house" on_create="quick_create"
+                        quick_create_view="odoo_thrones.quick_create_player_form">
+                    <field name="user"/>
+                    <field name="level"/>
+                    <field name="avatar"/>
+                    <field name="flag"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                                <a type="open">
+                                    <!-- Mostrar el avatar del jugador -->
+                                    <img class="oe_kanban_image" t-att-alt="record.user.value"
+                                         t-att-src="kanban_image('odoo_thrones.player','avatar',record.id.value)" width="100"/>
+                                </a>
+                                <div t-if="record.flag" class="flag-container">
+                                    <img class="oe_kanban_image" t-att-alt="record.user.value"
+                                         t-att-src="kanban_image('odoo_thrones.player','flag',record.id.value)"
+                                         alt="Flag" width="40" height="40"/>
+                                </div>
+                                <div t-attf-class="oe_kanban_content">
+                                    <!-- Mostrar el nombre de usuario -->
+                                    <h4>
+                                        <a type="edit">
+                                            <field name="user"/>
+                                        </a>
+                                    </h4>
+                                    <!-- Mostrar la bandera al lado del avatar -->
+
+                                    <!-- Mostrar el nivel del jugador -->
+
+                                        Level:<field name="level"/>
 
 
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
 
 
+        <!--FORMULARI DE CREACIÓ RÁPIDA EN KABAN-->
+
+        <record model="ir.ui.view" id="odoo_thrones.quick_create_player_form">
+            <field name="name">odoo_thrones.player form quickcreate</field>
+            <field name="model">odoo_thrones.player</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="user"/>
+                        <field name="name"/>
+                        <field name="birth_date"/>
+                        <field name="password"/>
+                        <field name="house"/>
+                    </group>
+                </form>
+            </field>
+        </record>
 
 
-         <!-- VISTAS SEARCH -->
+        <!-- VISTAS SEARCH -->
         <record model="ir.ui.view" id="odoo_thrones.player_search">
             <field name="name">odooThrones player search</field>
             <field name="model">odoo_thrones.player</field>
             <field name="arch" type="xml">
                 <search>
                     <field name="name"/>
+                    <field name="user"/>
+                    <field name="house"/>
                     <field name="level" string="Nivel desde" filter_domain="[('level','>=',self)]"/>
+
                     <filter name="group_by_house" string="Agrupar por casa" context="{'group_by':'house'}"/>
                 </search>
             </field>
         </record>
 
 
-
-
-
-
         <!-- actions opening views on models -->
         <record model="ir.actions.act_window" id="odoo_thrones.player_action_window">
             <field name="name">odooThrones Players</field>
             <field name="res_model">odoo_thrones.player</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,kanban</field>
         </record>
         <record model="ir.actions.act_window" id="odoo_thrones.building_action_window">
             <field name="name">odooThrones Buildings window</field>

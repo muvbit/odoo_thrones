@@ -2,10 +2,11 @@
 import base64
 import os
 from datetime import datetime, date
+
 from email.policy import default
 
 from cloudinit.config.cc_spacewalk import required_packages
-from odoo import models, fields, api
+from odoo import models, fields, api, tools
 from odoo.exceptions import ValidationError
 
 from odoo.fields import One2many
@@ -55,32 +56,41 @@ class Player (models.Model):
 
         # Relacionamos los linajes con los archivos de las banderas
         house_flags = {
-            "stark": "stark.webp",
-            "lannister": "lannister.webp",
-            "targaryen": "targaryen.webp",
-            "greyjoy": "greyjoy.webp",
-            "baratheon": "baratheon.webp",
-            "martell": "martell.webp",
-            "tyrell": "tyrell.webp",
-            "tully": "tully.webp",
-            "arryn": "arryn.webp",
+            "stark": "stark.png",
+            "lannister": "lannister.png",
+            "bolton":"bolton.png",
+            "targaryen": "targaryen.png",
+            "greyjoy": "greyjoy.png",
+            "baratheon": "baratheon.png",
+            "martell": "martell.png",
+            "tyrell": "tyrell.png",
+            "tully": "tully.png",
+            "arryn": "arryn.png",
         }
 
-        for record in self:
-            image_file = house_flags.get(record.house)
+        for player in self:
+            image_file = house_flags.get(player.house)
             if image_file:
                 image_path = os.path.join(flags_path, image_file)
                 try:
-                    with open(image_path, 'rb') as f:
-                        record.flag = base64.b64encode(f.read())
+                   with open(image_path, 'rb') as f:
+                        player.flag = base64.b64encode(f.read())
                 except FileNotFoundError:
-                    record.flag = False
+                    player.flag = False
             else:
-                record.flag = False
+               player.flag = False
+
 
     flag=fields.Image(string="Casa", compute="_get_houseFlag")
 
     level=fields.Integer(default=1)
+
+    @api.constrains('level')
+    def _check_level(self):
+        for player in self:
+            if player.level < 0:
+                raise ValidationError("El nivel no puede ser menor que 0.")
+
 
     #Recursos
     gold=fields.Integer(string="Oro",default=10000, readonly=True)
@@ -103,6 +113,7 @@ class Player (models.Model):
 
     def increment_iron(self):
         self.iron+=100
+
     def increment_level(self):
         self.level+=1
 
@@ -116,8 +127,8 @@ class Player (models.Model):
         self.iron -= 100
 
     def decrement_level(self):
-        self.level -= 1
-
+        if self.level >1:
+            self.level -= 1
 
 
 
@@ -128,6 +139,13 @@ class Building (models.Model):
     name=fields.Char(string="Nombre del edificio",required=True)
 
     level=fields.Integer(string="Nivel", default=1, required=True)
+
+    @api.constrains('level')
+    def _check_level(self):
+        for building in self:
+            if building.level < 0:
+                raise ValidationError("El nivel no puede ser menor que 0.")
+
     gold_cost = fields.Integer(string="Coste en oro", required=True)
     wood_cost=fields.Integer(string="Coste en madera", required=True)
     iron_cost=fields.Integer(string="Coste en hierro", required=True)
@@ -166,6 +184,13 @@ class Creature (models.Model):
     health = fields.Integer(string="Vida", required=True)
     gold_cost=fields.Integer(string="Coste en oro")
     level=fields.Integer(string="Nivel")
+
+    @api.constrains('level')
+    def _check_level(self):
+        for creature in self:
+            if creature.level < 0:
+                raise ValidationError("El nivel no puede ser menor que 0.")
+
     attack=fields.Integer(string="Ataque", required=True)
     defense=fields.Integer(string="Defensa", required=True)
 
@@ -175,7 +200,7 @@ class PlayerCreature(models.Model):
     _name = "odoo_thrones.player_creature"
     _description = "Criaturas del jugador"
 
-    name=fields.Char(string="Nombre de la criatura")
+    name=fields.Char(related="creature_id.name")
     player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
     creature_id = fields.Many2one("odoo_thrones.creature", string="Criatura")
     level = fields.Integer(related='creature_id.level', string="Nivel requerido", readonly=True)
@@ -192,6 +217,13 @@ class Unit (models.Model):
     name = fields.Char(string="Nombre de la unidad", required=True)
     health = fields.Integer(string="Puntos de vida", required=True)
     level=fields.Integer(string="Nivel requerido", required=True)
+
+    @api.constrains('level')
+    def _check_level(self):
+        for unit in self:
+            if unit.level < 0:
+                raise ValidationError("El nivel no puede ser menor que 0.")
+
     attack = fields.Integer(string="Puntos de ataque", required=True)
     defense = fields.Integer(string="Puntos de defensa", required=True)
     gold_cost = fields.Integer(string="Coste en oro", required=True)
@@ -203,6 +235,7 @@ class PlayerUnit(models.Model):
     _name = "odoo_thrones.player_unit"
     _description = "Unidades del jugador"
 
+    name = fields.Char(related="unit_id.name")
     player_id = fields.Many2one("odoo_thrones.player", string="Jugador")
     unit_id = fields.Many2one("odoo_thrones.unit", string="Unidad")
     level = fields.Integer(related='unit_id.level', string="Nivel requerido", readonly=True)
@@ -216,6 +249,12 @@ class Ship(models.Model):
 
     name=fields.Char(string="Nombre del barco", required=True)
     level=fields.Integer(string="Nivel", required=True)
+    @api.constrains('level')
+    def _check_level(self):
+        for ship in self:
+            if ship.level < 0:
+                raise ValidationError("El nivel no puede ser menor que 0.")
+
     health = fields.Integer(string="Puntos de vida", required=True)
     cannons= fields.Integer(string="Cañones",required=True)
     attack = fields.Integer(string="Puntos de ataque", required=True)
@@ -228,6 +267,7 @@ class PlayerShip(models.Model):
     _name = "odoo_thrones.player_ship"
     _description = "Barcos del jugador"
 
+    name=fields.Char(related="ship_id.name")
     player_id = fields.Many2one("odoo_thrones.player", string="Jugador", required=True)
     ship_id = fields.Many2one("odoo_thrones.ship", string="Barco", required=True)
     level = fields.Integer(related='ship_id.level', string="Nivel requerido", readonly=True)
