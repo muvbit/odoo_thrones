@@ -1,0 +1,130 @@
+<!-- views/wizards_views.xml -->
+<odoo>
+    <!-- Vista para el wizard de registro de jugadores -->
+    <record id="view_player_registration_wizard_form" model="ir.ui.view">
+        <field name="name">player.registration.wizard.form</field>
+        <field name="model">odoo_thrones.player_registration_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Registro de Jugador">
+                <group>
+                    <field name="user"/>
+                    <field name="password"/>
+                    <field name="name"/>
+                    <field name="birth_date"/>
+                    <field name="house"/>
+                    <field name="avatar"/>
+                </group>
+                <footer>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    <button string="Registrar" class="btn-primary" type="object" name="action_register_player"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista para comprar barcos -->
+    <record id="view_buy_ship_wizard_form" model="ir.ui.view">
+        <field name="name">buy.ship.wizard.form</field>
+        <field name="model">odoo_thrones.buy_ship_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Comprar Barcos">
+                <group>
+                    <field name="player_id"/>
+                    <field name="ship_id"/>
+                    <field name="amount"/>
+                    <field name="total_cost_gold" readonly="1"/>
+                    <field name="total_cost_wood" readonly="1"/>
+                    <field name="total_cost_iron" readonly="1"/>
+                </group>
+                <footer>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    <button string="Comprar" class="btn-primary" type="object" name="action_buy_ship"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista para comprar unidades -->
+    <record id="view_buy_unit_wizard_form" model="ir.ui.view">
+        <field name="name">buy.unit.wizard.form</field>
+        <field name="model">odoo_thrones.buy_unit_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Comprar Unidades">
+                <group>
+                    <field name="player_id"/>
+                    <field name="unit_id"/>
+                    <field name="amount"/>
+                    <field name="total_cost_gold" readonly="1"/>
+                    <field name="total_cost_wood" readonly="1"/>
+                    <field name="total_cost_iron" readonly="1"/>
+                </group>
+                <footer>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    <button string="Comprar" class="btn-primary" type="object" name="action_buy_unit"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista para comprar criaturas -->
+<record id="view_buy_creature_wizard_form" model="ir.ui.view">
+    <field name="name">buy.creature.wizard.form</field>
+    <field name="model">odoo_thrones.buy_creature_wizard</field>
+    <field name="arch" type="xml">
+        <form string="Comprar Criaturas">
+            <group>
+                <field name="player_id"/>
+                <field name="creature_id" domain="[('house', '=', player_id.house)]"/>
+                <field name="amount"/>
+                <field name="total_cost_gold" readonly="1"/>
+            </group>
+            <footer>
+                <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                <button string="Comprar" class="btn-primary" type="object" name="action_buy_creature"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+    <!-- Vista para el wizard de ataque -->
+    <record id="view_attack_wizard_form" model="ir.ui.view">
+        <field name="name">attack.wizard.form</field>
+        <field name="model">odoo_thrones.attack_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Atacar">
+                <group>
+                    <field name="attacker_id"/>
+                    <field name="defender_id"/>
+                    <field name="units_to_attack"/>
+                    <field name="ships_to_attack"/>
+                    <field name="creatures_to_attack"/>
+                </group>
+                <footer>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    <button string="Atacar" class="btn-primary" type="object" name="action_attack"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acciones para abrir los wizards -->
+    <record id="action_player_registration_wizard" model="ir.actions.act_window">
+        <field name="name">Registro de Jugador</field>
+        <field name="res_model">odoo_thrones.player_registration_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <record id="action_attack_wizard" model="ir.actions.act_window">
+        <field name="name">Atacar</field>
+        <field name="res_model">odoo_thrones.attack_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menús para acceder a los wizards -->
+    <menuitem id="menu_player_registration" name="Registro de Jugador" action="action_player_registration_wizard"/>
+    <menuitem id="menu_acquisition" name="Adquirir Recursos" action="action_acquisition_wizard"/>
+    <menuitem id="menu_attack" name="Atacar" action="action_attack_wizard"/>
+</odoo>

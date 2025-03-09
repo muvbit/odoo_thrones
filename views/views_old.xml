@@ -1,5 +1,7 @@
 <odoo>
     <data>
+        <!-- explicit list view definition -->
+
         <!-- VISTAS TREE -->
         <record model="ir.ui.view" id="odoo_thrones.player_list">
             <field name="name">odooThrones player list</field>
@@ -43,7 +45,7 @@
                 <tree decoration-info="level==1">
                     <field name="name"/>
                     <field name="level"/>
-                    <field name="health" widget="progressbar" options="{'max_value': 100, 'editable': False}"/>
+                    <field name="health"/>
                     <field name="attack"/>
                     <field name="defense"/>
                     <field name="gold_cost"/>
@@ -61,7 +63,7 @@
                     <field name="name"/>
                     <field name="house"/>
                     <field name="level"/>
-                    <field name="health" widget="progressbar" options="{'max_value': 100, 'editable': False}"/>
+                    <field name="health"/>
                     <field name="attack"/>
                     <field name="defense"/>
                     <field name="gold_cost"/>
@@ -76,7 +78,7 @@
                 <tree decoration-info="level==1">
                     <field name="name"/>
                     <field name="level"/>
-                    <field name="health" widget="progressbar" options="{'max_value': 100, 'editable': False}"/>
+                    <field name="health"/>
                     <field name="cannons"/>
                     <field name="attack"/>
                     <field name="defense"/>
@@ -96,15 +98,11 @@
                     <header>
                         <button name="decrement_level" type="object" icon="fa-level-down" string="-Nivel"/>
                         <button name="increment_level" type="object" icon="fa-level-up" string="+Nivel"/>
-                        <button name="decrement_wood" type="object" icon="fa-level-down" string="-Madera"/>
-                        <button name="increment_wood" type="object" icon="fa-level-up" string="+Madera"/>
-                        <button name="decrement_gold" type="object" icon="fa-level-down" string="-Oro"/>
-                        <button name="increment_gold" type="object" icon="fa-level-up" string="+Oro"/>
-                        <button name="decrement_iron" type="object" icon="fa-level-down" string="-Hierro"/>
-                        <button name="increment_iron" type="object" icon="fa-level-up" string="+Hierro"/>
+
                         <field name="house" widget="statusbar"/>
                     </header>
                     <sheet>
+
                         <field name="avatar" widget="image" height="150"/>
                         <field name="flag" widget="image" height="60"/>
                         <group>
@@ -125,6 +123,7 @@
                                 <field name="gold"/>
                             </group>
                         </group>
+
                         <notebook>
                             <page string="Edificios">
                                 <field name="buildings">
@@ -139,7 +138,6 @@
                                     <tree>
                                         <field name="name"/>
                                         <field name="amount"/>
-                                        <field name="current_health" widget="progressbar" options="{'max_value': 'max_health', 'editable': False}"/>
                                     </tree>
                                 </field>
                             </page>
@@ -148,7 +146,6 @@
                                     <tree>
                                         <field name="name"/>
                                         <field name="amount"/>
-                                        <field name="current_health" widget="progressbar" options="{'max_value': 'max_health', 'editable': False}"/>
                                     </tree>
                                 </field>
                             </page>
@@ -157,22 +154,24 @@
                                     <tree>
                                         <field name="name"/>
                                         <field name="amount"/>
-                                        <field name="current_health" widget="progressbar" options="{'max_value': 'max_health', 'editable': False}"/>
                                     </tree>
                                 </field>
                             </page>
                         </notebook>
+
                     </sheet>
                 </form>
             </field>
         </record>
+
 
         <!-- VISTA KANBAN -->
         <record model="ir.ui.view" id="odoo_thrones.player_kanban">
             <field name="name">odoo_thrones.player kanban</field>
             <field name="model">odoo_thrones.player</field>
             <field name="arch" type="xml">
-                <kanban default_group_by="house" on_create="quick_create" quick_create_view="odoo_thrones.quick_create_player_form">
+                <kanban default_group_by="house" on_create="quick_create"
+                        quick_create_view="odoo_thrones.quick_create_player_form">
                     <field name="user"/>
                     <field name="level"/>
                     <field name="avatar"/>
@@ -181,18 +180,29 @@
                         <t t-name="kanban-box">
                             <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill">
                                 <a type="open">
-                                    <img class="oe_kanban_image" t-att-alt="record.user.value" t-att-src="kanban_image('odoo_thrones.player','avatar',record.id.value)" width="100"/>
+                                    <!-- Mostrar el avatar del jugador -->
+                                    <img class="oe_kanban_image" t-att-alt="record.user.value"
+                                         t-att-src="kanban_image('odoo_thrones.player','avatar',record.id.value)" width="100"/>
                                 </a>
                                 <div t-if="record.flag" class="flag-container">
-                                    <img class="oe_kanban_image" t-att-alt="record.user.value" t-att-src="kanban_image('odoo_thrones.player','flag',record.id.value)" alt="Flag" width="40" height="40"/>
+                                    <img class="oe_kanban_image" t-att-alt="record.user.value"
+                                         t-att-src="kanban_image('odoo_thrones.player','flag',record.id.value)"
+                                         alt="Flag" width="40" height="40"/>
                                 </div>
                                 <div t-attf-class="oe_kanban_content">
+                                    <!-- Mostrar el nombre de usuario -->
                                     <h4>
                                         <a type="edit">
                                             <field name="user"/>
                                         </a>
                                     </h4>
-                                    Level:<field name="level"/>
+                                    <!-- Mostrar la bandera al lado del avatar -->
+
+                                    <!-- Mostrar el nivel del jugador -->
+
+                                        Level:<field name="level"/>
+
+
                                 </div>
                             </div>
                         </t>
@@ -201,7 +211,9 @@
             </field>
         </record>
 
-        <!-- FORMULARIO DE CREACIÓN RÁPIDA EN KANBAN -->
+
+        <!--FORMULARI DE CREACIÓ RÁPIDA EN KABAN-->
+
         <record model="ir.ui.view" id="odoo_thrones.quick_create_player_form">
             <field name="name">odoo_thrones.player form quickcreate</field>
             <field name="model">odoo_thrones.player</field>
@@ -218,6 +230,7 @@
             </field>
         </record>
 
+
         <!-- VISTAS SEARCH -->
         <record model="ir.ui.view" id="odoo_thrones.player_search">
             <field name="name">odooThrones player search</field>
@@ -228,10 +241,12 @@
                     <field name="user"/>
                     <field name="house"/>
                     <field name="level" string="Nivel desde" filter_domain="[('level','>=',self)]"/>
+
                     <filter name="group_by_house" string="Agrupar por casa" context="{'group_by':'house'}"/>
                 </search>
             </field>
         </record>
+
 
         <!-- actions opening views on models -->
         <record model="ir.actions.act_window" id="odoo_thrones.player_action_window">
@@ -244,6 +259,7 @@
             <field name="res_model">odoo_thrones.building</field>
             <field name="view_mode">tree,form</field>
         </record>
+
         <record model="ir.actions.act_window" id="odoo_thrones.unit_action_window">
             <field name="name">odooThrones Units window</field>
             <field name="res_model">odoo_thrones.unit</field>
@@ -260,17 +276,42 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+
+        <!-- server action to the one above -->
+        <!--
+            <record model="ir.actions.server" id="odoo_thrones.action_server">
+              <field name="name">odooThrones server</field>
+              <field name="model_id" ref="model_odoo_thrones_odoo_thrones"/>
+              <field name="state">code</field>
+              <field name="code">
+                action = {
+                  "type": "ir.actions.act_window",
+                  "view_mode": "tree,form",
+                  "res_model": model._name,
+                }
+              </field>
+            </record>
+        -->
+
         <!-- Top menu item -->
+
         <menuitem name="odooThrones" id="odoo_thrones.menu_root"/>
 
         <!-- menu categories -->
         <menuitem name="Management" id="odoo_thrones.menuManagement" parent="odoo_thrones.menu_root"/>
+        <!-- <menuitem name="Menu 2" id="odoo_thrones.menu_2" parent="odoo_thrones.menu_root"/> -->
 
         <!-- actions -->
-        <menuitem name="Players" id="odoo_thrones.menu_player_list" parent="odoo_thrones.menuManagement" action="odoo_thrones.player_action_window"/>
-        <menuitem name="Buildings" id="odoo_thrones.menu_building_list" parent="odoo_thrones.menuManagement" action="odoo_thrones.building_action_window"/>
-        <menuitem name="Units" id="odoo_thrones.menu_unit_list" parent="odoo_thrones.menuManagement" action="odoo_thrones.unit_action_window"/>
-        <menuitem name="Ships" id="odoo_thrones.menu_ship_list" parent="odoo_thrones.menuManagement" action="odoo_thrones.ship_action_window"/>
-        <menuitem name="Creatures" id="odoo_thrones.menu_creature_list" parent="odoo_thrones.menuManagement" action="odoo_thrones.creature_action_window"/>
+
+        <menuitem name="Players" id="odoo_thrones.menu_player_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.player_action_window"/>
+        <menuitem name="Buildings" id="odoo_thrones.menu_building_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.building_action_window"/>
+        <menuitem name="Units" id="odoo_thrones.menu_unit_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.unit_action_window"/>
+        <menuitem name="Ships" id="odoo_thrones.menu_ship_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.ship_action_window"/>
+        <menuitem name="Creatures" id="odoo_thrones.menu_creature_list" parent="odoo_thrones.menuManagement"
+                  action="odoo_thrones.creature_action_window"/>
     </data>
 </odoo>
